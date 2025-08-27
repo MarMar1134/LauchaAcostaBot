@@ -27,7 +27,7 @@ reddit = praw.Reddit(
     ratelimit_seconds=300
 )
 
-subreddit = reddit.subreddit("ClubLanus")
+subreddit = reddit.subreddit("ClubLanus+fulbo")
 
 # All these words will be searched to activate the bot
 matching_cases = re.compile(r"\b(el\s+laucha|lautaro\s+acosta|laucha\s+acosta)\b", re.IGNORECASE)
@@ -69,7 +69,7 @@ def save_comment_id(comment_id):
 def get_random_phrase():
     return random.choice(phrases)
 
-logging.info("Bot iniciado - Monitoreando r/ClubLanus")
+logging.info("Bot iniciado - Monitoreando r/ClubLanus  y r/fulbo")
 
 try:
     for comment in subreddit.stream.comments(skip_existing=True):
