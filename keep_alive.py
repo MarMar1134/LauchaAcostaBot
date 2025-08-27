@@ -58,8 +58,8 @@ def should_restart():
 
 # Función principal del bot (en hilo separado)
 def bot_manager():
-    global current_process, bot_status
-    
+    global current_process, bot_status, restart_count
+
     logging.info("Keep Alive iniciado - Monitoreando bot...")
     bot_status = "running"
 
