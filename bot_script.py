@@ -23,14 +23,14 @@ reddit = praw.Reddit(
     client_secret=os.getenv("REDDIT_CLIENT_SECRET"),
     password=os.getenv("REDDIT_PASSWORD"),
     username=os.getenv("REDDIT_USERNAME"),
-    user_agent="Laucha-Acosta-v1",
+    user_agent="Laucha-Acosta-v1.1",
     ratelimit_seconds=300
 )
 
 subreddit = reddit.subreddit("ClubLanus+fulbo")
 
 # All these words will be searched to activate the bot
-matching_cases = re.compile(r"\b(el\s+laucha|lautaro\s+acosta|laucha\s+acosta)\b", re.IGNORECASE)
+matching_cases = re.compile(r"\b(el\s+laucha|lautaro\s+acosta|laucha\s+acosta|al\s+laucha)\b", re.IGNORECASE)
 
 phrases = [
     "es todo lo que yo no soy",
