@@ -6,7 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="b99508fe-b671-40c3-b115-3335f2929adc" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bot_script.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot_script.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

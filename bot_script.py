@@ -27,8 +27,7 @@ redditEnv = praw.Reddit(
     ratelimit_seconds=300
 )
 
-#subreddits = redditEnv.subreddit("ClubLanus+fulbo")
-subreddits = redditEnv.subreddit("testingground4bots")
+subreddits = redditEnv.subreddit("ClubLanus+fulbo")
 
 # All these words will be searched to activate the bot
 matchingCases = re.compile(r"\b(el\s+laucha|lautaro\s+acosta|laucha\s+acosta|al\s+laucha)\b", re.IGNORECASE)
