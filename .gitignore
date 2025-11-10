@@ -1,4 +1,6 @@
+.idea
 .venv
+.gitignore
 bot.log
 keep_alive.log
 comments.txt

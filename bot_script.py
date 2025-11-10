@@ -7,8 +7,6 @@ import logging
 import praw
 from dotenv import load_dotenv
 
-from keep_alive import timeActive
-
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',

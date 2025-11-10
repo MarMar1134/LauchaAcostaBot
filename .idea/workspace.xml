@@ -5,8 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b99508fe-b671-40c3-b115-3335f2929adc" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/LauchaAcostaBot.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/LauchaAcostaBot.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bot_script.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot_script.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -30,8 +30,9 @@
     "Python.bot_script.executor": "Run",
     "Python.keep_alive.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "laucha__bot-v1.0",
+    "git-widget-placeholder": "master",
     "last_opened_file_path": "D:/Repositorios GitHub/LauchaAcostaBot",
     "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
