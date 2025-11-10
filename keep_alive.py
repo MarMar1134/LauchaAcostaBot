@@ -38,15 +38,15 @@ def health():
 @app.route('/status')
 def detailed_status():
     return jsonify({
-        "service": "LauchaAcostaBot Keep Alive",
+        "service": "LauchaAcostaBot Keep Alive Process",
         "bot_status": bot_status,
         "restart_count": restart_count,
         "max_restarts_per_hour": max_restarts_per_hour,
-        "process_running": current_process is not None and current_process.poll() is None
+        "process_running": current_process is not None
     })
 
-# Función para verificar si debe reiniciar
-def should_restart():
+#Checks if the bot needs a restart
+def shouldRestart():
     global restart_count
 
     if restart_count >= max_restarts_per_hour:
@@ -56,16 +56,16 @@ def should_restart():
 
     return True
 
-# Función principal del bot (en hilo separado)
+#Main thread
 def bot_manager():
-    global current_process, bot_status, restart_count
+    global current_process, bot_status, restart_count, timeActive
 
     logging.info("Keep Alive iniciado - Monitoreando bot...")
     bot_status = "running"
 
     while True:
         try:
-            if should_restart():
+            if shouldRestart():
                 logging.info(f"Inicializando bot (intento #{restart_count + 1})...")
                 bot_status = "starting"
 
@@ -84,24 +84,24 @@ def bot_manager():
                 sleep(30)
 
         except KeyboardInterrupt:
-            logging.info("Keep Alive detenido por el usuario")
+            logging.info("Proceso detenido por el usuario")
             bot_status = "stopped_by_user"
             print("\nEl programa se ha detenido exitosamente")
             break
 
         except Exception as ex:
-            logging.error(f"Error en keep_alive: {ex}")
+            logging.error(f"Error en la ejecución del loop principal: {ex}")
             bot_status = f"error: {str(ex)}"
             restart_count += 1
             sleep(60)
 
 if __name__ == "__main__":
-    # Iniciar el bot manager en un hilo separado
+    #Bot init
     bot_thread = threading.Thread(target=bot_manager)
     bot_thread.daemon = True
     bot_thread.start()
     
-    # Iniciar el servidor Flask para Render
+    #Server init
     port = int(os.environ.get('PORT', 5000))
     logging.info(f"Iniciando servidor HTTP en puerto {port}")
     app.run(host='0.0.0.0', port=port, debug=False)

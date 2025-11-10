@@ -1,0 +1,5 @@
+.venv
+bot.log
+keep_alive.log
+comments.txt
+submissions.txt
