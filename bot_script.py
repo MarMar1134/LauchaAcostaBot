@@ -6,33 +6,38 @@ import logging
 
 import praw
 from dotenv import load_dotenv
+from supabase import create_client, Client
 
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('bot.log'),
         logging.StreamHandler()
     ]
 )
 
 load_dotenv()
 
+# Reddit instance
 redditEnv = praw.Reddit(
     client_id=os.getenv("REDDIT_CLIENT_ID"),
     client_secret=os.getenv("REDDIT_CLIENT_SECRET"),
     password=os.getenv("REDDIT_PASSWORD"),
     username=os.getenv("REDDIT_USERNAME"),
-    user_agent="Laucha-Acosta-v1.1",
+    user_agent="Laucha-Acosta-v2.0",
     ratelimit_seconds=300
+)
+
+# Supabase, used to store comments id's and avoid duplications
+supabase: Client = create_client(
+    os.getenv("SUPABASE_URL"),
+    os.getenv("SUPABASE_KEY")
 )
 
 subreddits = redditEnv.subreddit("ClubLanus+fulbo")
 
-# All these words will be searched to activate the bot
 matchingCases = re.compile(r"\b(el\s+laucha|lautaro\s+acosta|laucha\s+acosta|al\s+laucha)\b", re.IGNORECASE)
 
-#All phrase candidates
 phrases = [
     "es todo lo que yo no soy",
     "Madurar es alcanzar un equilibrio, y en ese camino estoy, aprendiendo, escuchando a los que saben",
@@ -44,100 +49,45 @@ phrases = [
     "La gambeta me salvó la vida, y hacer terapia, la carrera"
 ]
 
+# Returns a random phrase from the phrase list
 def getRandomPhrase():
     return random.choice(phrases)
 
-# File where the answered comments are stored
-answeredCommentsFile = "comments.txt"
-answeredComments = set()
-
-answeredSubmissionsFile = "submissions.txt"
-answeredSubmissions = set()
-
-#Inicializes the files that contains answered posts and comments.
-def setUpFiles():
-    pComments = set()
-    pSubmissions = set()
-
-    if os.path.exists(answeredCommentsFile):
-        try:
-            with open(answeredCommentsFile, "r", encoding="utf-8") as f:
-                pComments = set(line.strip() for line in f.readlines())
-            logging.info(f"Cargados {len(pComments)} comentarios ya respondidos")
-        except Exception as e:
-            logging.error(f"Error cargando comentarios: {e}")
-
-    if os.path.exists(answeredSubmissionsFile):
-        try:
-            with open(answeredSubmissionsFile, "r", encoding="utf-8") as f:
-                pSubmissions = set(line.strip() for line in f.readlines())
-            logging.info(f"Cargados {len(pSubmissions)} posts ya respondidos")
-        except Exception as e:
-            logging.error(f"Error cargando posps: {e}")
-
-    return pComments, pSubmissions
-
-def isCommentAnswered(pCommentId) -> bool:
-    return pCommentId in answeredComments
-
-#Used to avoid replying to the same comments eternally
-def saveCommentId(pCommentId):
+def isAnswered(item_id: str) -> bool:
     try:
-        with open(answeredCommentsFile, "a", encoding="utf-8") as f:
-            f.write(f"{pCommentId}\n")
-        answeredComments.add(pCommentId)
-    except Exception as error:
-        logging.error(f"Error guardando comentario con ID:{pCommentId}, codigo de error: {error}")
+        result = supabase.table("answered_ids").select("id").eq("id", item_id).execute()
+        return len(result.data) > 0
+    except Exception as e:
+        logging.error(f"Error consultando Supabase para ID {item_id}: {e}")
+        return False
 
-def isSubmissionAnswered(pSubmissionId) -> bool:
-    return pSubmissionId in answeredSubmissions
-
-#Used to avoid replying to the same submissions eternally
-def saveSubmissionId(pSubmissionId):
+def saveId(item_id: str, item_type: str):
     try:
-        with open(answeredSubmissionsFile, "a", encoding="utf-8") as f:
-            f.write(f"{pSubmissionId}\n")
-        answeredSubmissions.add(pSubmissionId)
-    except Exception as error:
-        logging.error(f"Error guardando post con ID:{pSubmissionId}, codigo de error: {error}")
+        supabase.table("answered_ids").insert({"id": item_id, "type": item_type}).execute()
+    except Exception as e:
+        logging.error(f"Error guardando ID {item_id} en Supabase: {e}")
 
-#Start of the bot logic
-logging.info("Bot iniciado - Monitoreando r/ClubLanus  y r/fulbo")
+# Bot
+logging.info("Bot iniciado - Monitoreando r/ClubLanus y r/fulbo")
 
 try:
-    answeredComments, answeredSubmissions = setUpFiles()
-
-    #Iterates for each post on the scoped subreddits
-    for submission in subreddits.stream.submissions():
-        #Inside every post, iterates on every comment searching any match
-        for comment in submission.comments:
-            if isCommentAnswered(comment.id):
-                continue
-
-            if matchingCases.search(comment.body):
-                phrase = getRandomPhrase()
-
-                comment.reply(phrase)
-                saveCommentId(comment.id)
-
-                logging.info(f"Respondido a comentario {comment.id} con: '{phrase[:50]}...'")
-                sleep(30)
-
-        #Once the comments of the post are reviewed, checks if the post title contains a keyword
-        if isSubmissionAnswered(submission.id):
+    for comment in subreddits.stream.comments(skip_existing=True):
+        if isAnswered(comment.id):
             continue
 
-        if matchingCases.search(submission.title):
+        if matchingCases.search(comment.body):
             phrase = getRandomPhrase()
-
-            submission.reply(phrase)
-            saveSubmissionId(submission.id)
-
-            logging.info(f"Respondido al post {submission.id} con: {phrase[:50]}...")
-            sleep(30)
+            try:
+                comment.reply(phrase)
+                saveId(comment.id, "comment")
+                logging.info(f"Respondido comentario {comment.id}: '{phrase[:50]}...'")
+                sleep(30)
+            except Exception as e:
+                logging.error(f"Error respondiendo comentario {comment.id}: {e}")
+                sleep(60)
 
 except KeyboardInterrupt:
     logging.info("Bot detenido por el usuario")
 except Exception as e:
-    logging.error(f"Error crítico en el bot: {e}")
+    logging.error(f"Error crítico: {e}")
     raise
